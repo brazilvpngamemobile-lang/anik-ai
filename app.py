@@ -1,15 +1,21 @@
 from flask import Flask, request, render_template, send_file, jsonify
 import subprocess
 import os
+import re
 
-# template_folder স্পষ্টভাবে ডিক্লেয়ার করা হলো যাতে Render-এ এরর না আসে
 app = Flask(__name__, template_folder='templates')
 
 SHERPA_CMD = "./sherpa-onnx-v1.12.21-linux-x64-shared/bin/sherpa-onnx-offline-tts"
-STUDIO_FILTER = "highpass=f=90, lowpass=f=12000, equalizer=f=3000:t=q:w=1:g=2, dynaudnorm=f=150:g=15"
+
+# Voice Realism Filters: 
+# lowpass=10000 ডিজিটাল শার্পনেস কমায় (Warmth বাড়ায়)
+# equalizer=f=250 মানুষের গলার গভীরতা বাড়ায়
+# dynaudnorm ভলিউম স্বাভাবিক রাখে
+STUDIO_FILTER = "highpass=f=80, lowpass=f=10000, equalizer=f=250:t=q:w=1:g=2, dynaudnorm=f=150:g=10"
+
 VOICE_EFFECTS = {
     "Deep Male": "asetrate=22050*0.92,atempo=1.08", 
-    "News Anchor": "volume=1.2,equalizer=f=5000:t=q:w=1:g=3", 
+    "News Anchor": "volume=1.2,equalizer=f=5000:t=q:w=1:g=2", 
     "Whispering": "volume=0.4,highpass=f=1000"
 }
 
@@ -25,9 +31,14 @@ def generate():
     data = request.json
     text = data.get('text')
     voice_type = data.get('voice', 'Professional Female')
-    speed = float(data.get('speed', 0.9))
     
-    speed = max(0.5, min(1.5, speed))
+    # স্পিড ডিফল্ট ০.৮৫ করা হলো (আরও ধীরে ও স্বাভাবিক শোনানোর জন্য)
+    speed = float(data.get('speed', 0.85)) 
+    speed = max(0.5, min(1.2, speed)) # সর্বোচ্চ স্পিড ১.২ করা হলো যাতে দ্রুত না শোনায়
+    
+    # টেক্সটের পরে কমা বা দাঁড়ি থাকলে সেখানে একটু বেশি স্পেস যোগ করা হবে যাতে এআই শ্বাস নিতে পারে
+    text = re.sub(r'([.,!?])', r'\1 ', text)
+    
     temp_wav = 'temp_output.wav'
     final_wav = 'output.wav'
     
