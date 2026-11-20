@@ -7,15 +7,21 @@ app = Flask(__name__, template_folder='templates')
 
 SHERPA_CMD = "./sherpa-onnx-v1.12.21-linux-x64-shared/bin/sherpa-onnx-offline-tts"
 
-# Voice Realism Filters: 
-# lowpass=10000 ডিজিটাল শার্পনেস কমায় (Warmth বাড়ায়)
-# equalizer=f=250 মানুষের গলার গভীরতা বাড়ায়
-# dynaudnorm ভলিউম স্বাভাবিক রাখে
-STUDIO_FILTER = "highpass=f=80, lowpass=f=10000, equalizer=f=250:t=q:w=1:g=2, dynaudnorm=f=150:g=10"
+# Ultra-Realistic Studio Filters:
+# ১. aecho: হালকা রুম রিভার্ব (যেমনটা বাস্তবে শোনা যায়)
+# ২. equalizer: মানুষের কণ্ঠের ওয়ার্মথ এবং ক্ল্যারিটি বাড়ানো
+# ৩. compand: ভলিউমের ওঠানামা নিয়ন্ত্রণ করা
+STUDIO_FILTER = (
+    "highpass=f=85, lowpass=f=11000, "
+    "equalizer=f=200:t=q:w=1:g=2.5, "
+    "equalizer=f=3500:t=q:w=1.5:g=1, "
+    "compand=attacks=0.05:decays=0.2:points=-80/-80|-20/-15|0/-6, "
+    "aecho=0.8:0.88:20:0.1" 
+)
 
 VOICE_EFFECTS = {
     "Deep Male": "asetrate=22050*0.92,atempo=1.08", 
-    "News Anchor": "volume=1.2,equalizer=f=5000:t=q:w=1:g=2", 
+    "News Anchor": "volume=1.1,equalizer=f=4000:t=q:w=1:g=2", 
     "Whispering": "volume=0.4,highpass=f=1000"
 }
 
@@ -32,11 +38,11 @@ def generate():
     text = data.get('text')
     voice_type = data.get('voice', 'Professional Female')
     
-    # স্পিড ডিফল্ট ০.৮৫ করা হলো (আরও ধীরে ও স্বাভাবিক শোনানোর জন্য)
-    speed = float(data.get('speed', 0.85)) 
-    speed = max(0.5, min(1.2, speed)) # সর্বোচ্চ স্পিড ১.২ করা হলো যাতে দ্রুত না শোনায়
+    # ডিফল্ট স্পিড ০.৮ করা হলো (খুব বেশি ধীরে ও স্বাভাবিক)
+    speed = float(data.get('speed', 0.8)) 
+    speed = max(0.5, min(1.2, speed)) 
     
-    # টেক্সটের পরে কমা বা দাঁড়ি থাকলে সেখানে একটু বেশি স্পেস যোগ করা হবে যাতে এআই শ্বাস নিতে পারে
+    # কমা বা দাঁড়ির পর ন্যাচারাল শ্বাস নেওয়ার জন্য স্পেস
     text = re.sub(r'([.,!?])', r'\1 ', text)
     
     temp_wav = 'temp_output.wav'
@@ -51,16 +57,30 @@ def generate():
         tokens_path = "./vits-piper-en_US-lessac-medium/tokens.txt"
         data_dir = "./vits-piper-en_US-lessac-medium/espeak-ng-data"
     
-    cmd = [SHERPA_CMD, f'--vits-model={model_path}', f'--vits-tokens={tokens_path}', f'--vits-data-dir={data_dir}', '--vits-lexicon=./lexicon-en-us.txt', f'--output-filename={temp_wav}', text]
+    # --vits-noise-scale এবং --vits-noise-scale-w যোগ করা হলো রোবটিক ভাব কাটানোর জন্য
+    cmd = [
+        SHERPA_CMD, 
+        f'--vits-model={model_path}', 
+        f'--vits-tokens={tokens_path}', 
+        f'--vits-data-dir={data_dir}', 
+        '--vits-lexicon=./lexicon-en-us.txt', 
+        '--vits-noise-scale=0.8',
+        '--vits-noise-scale-w=0.8',
+        f'--output-filename={temp_wav}', 
+        text
+    ]
     
     try:
         subprocess.run(cmd, check=True, capture_output=True, text=True)
+        
         filters = [STUDIO_FILTER, f"atempo={speed}"]
         if voice_type in VOICE_EFFECTS: 
             filters.append(VOICE_EFFECTS[voice_type])
             
         final_filter = ", ".join(filters)
-        subprocess.run(f'ffmpeg -y -i {temp_wav} -filter:a "{final_filter}" {final_wav}', shell=True, check=True, capture_output=True)
+        
+        # -ar 44100 দিয়ে CD কোয়ালিটি নিশ্চিত করা হয়েছে
+        subprocess.run(f'ffmpeg -y -i {temp_wav} -filter:a "{final_filter}" -ar 44100 {final_wav}', shell=True, check=True, capture_output=True)
         
         if os.path.exists(temp_wav): 
             os.remove(temp_wav)
