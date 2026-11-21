@@ -171,7 +171,15 @@
             submitBtn.disabled = true; submitBtn.innerText = "Synthesizing..."; submitBtn.classList.add('loading'); resultSection.classList.remove('active'); errorBox.style.display = 'none'; audio.pause(); waveLoader.style.display = 'flex';
             try {
                 const response = await fetch('/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice, speed: speed }) });
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const bodyPreview = (await response.text()).slice(0, 160);
+                    throw new Error(response.status === 404
+                        ? 'API endpoint not found (404). Render service may be deployed as a Static Site or the start command is incorrect.'
+                        : `Server returned HTML instead of JSON (HTTP ${response.status}). Check the Render backend logs. ${bodyPreview.startsWith('<') ? '' : bodyPreview}`);
+                }
                 const data = await response.json();
+                if (!response.ok && !data.error) throw new Error(`Server error: HTTP ${response.status}`);
                 if (data.success) {
                     setTimeout(() => {
                         submitBtn.disabled = false; submitBtn.innerText = "Generate Voice"; submitBtn.classList.remove('loading'); waveLoader.style.display = 'none';
@@ -179,6 +187,7 @@
                     }, 500);
                 } else { throw new Error(data.error); }
             } catch (error) {
+                console.error('Anik AI request failed:', error);
                 submitBtn.disabled = false; submitBtn.innerText = "Generate Voice"; submitBtn.classList.remove('loading'); waveLoader.style.display = 'none'; errorBox.style.display = 'block'; errorBox.innerText = error.message;
             }
         });
