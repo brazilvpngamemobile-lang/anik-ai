@@ -6,115 +6,31 @@
     <title>Anik AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg: #09090b; 
-            --card-bg: #121216; 
-            --primary: #6366f1; 
-            --primary-glow: rgba(99, 102, 241, 0.3); 
-            --text-main: #f8fafc; 
-            --text-muted: #94a3b8; 
-            --border: #27272a; 
-        }
-        
+        :root { --bg: #09090b; --card-bg: #121216; --primary: #6366f1; --primary-glow: rgba(99, 102, 241, 0.3); --text-main: #f8fafc; --text-muted: #94a3b8; --border: #27272a; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100dvh; 
-            padding: 10px; 
-            overflow: hidden; 
-            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 70%); 
-        }
-        
-        .studio-container { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border); 
-            padding: 20px 20px; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7); 
-            width: 100%; 
-            max-width: 420px; 
-            max-height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-        }
-        
+        body { background-color: var(--bg); color: var(--text-main); display: flex; justify-content: center; align-items: center; height: 100dvh; padding: 10px; overflow: hidden; background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 70%); }
+        .studio-container { background: var(--card-bg); border: 1px solid var(--border); padding: 20px 20px; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7); width: 100%; max-width: 420px; max-height: 100%; display: flex; flex-direction: column; gap: 12px; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
         .header { text-align: center; margin-bottom: 5px; }
-        
-        /* 🌟 Premium Metallic Shimmer Title (Matched with website color) */
-        .header h1 { 
-            font-size: clamp(28px, 8vw, 36px); 
-            font-weight: 800; 
-            margin-bottom: 6px; 
-            letter-spacing: -1px; 
-            
-            /* ওয়েবসাইটের প্রাইমারি কালার (সাদা ও হালকা ইন্ডিগো) */
-            background: linear-gradient(120deg, #a5b4fc 30%, #ffffff 50%, #a5b4fc 70%);
-            background-size: 200% auto;
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            
-            /* স্মুথ শিমার অ্যানিমেশন */
-            animation: metallicShine 3.5s linear infinite;
-            
-            /* হালকা নিওন গ্লো */
-            filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.3));
-        }
-        
-        @keyframes metallicShine {
-            to { background-position: 200% center; }
-        }
-        
-        .header p { 
-            color: var(--text-muted); 
-            font-size: clamp(10px, 3vw, 12px); 
-            font-weight: 500; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            animation: fadeIn 1.5s ease-out;
-        }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .header h1 { font-size: clamp(28px, 8vw, 36px); font-weight: 800; margin-bottom: 6px; letter-spacing: -1px; background: linear-gradient(120deg, #a5b4fc 30%, #ffffff 50%, #a5b4fc 70%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: metallicShine 3.5s linear infinite; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.3)); }
+        @keyframes metallicShine { to { background-position: 200% center; } }
+        .header p { color: var(--text-muted); font-size: clamp(10px, 3vw, 12px); font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
         
         .input-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-        label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; }
+        label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
         
-        textarea, select { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 12px; 
-            background: #0a0a0c; 
-            border: 1px solid var(--border); 
-            color: var(--text-main); 
-            font-size: 14px; 
-            outline: none; 
-            transition: all 0.3s ease; 
-            resize: none; 
-        }
+        /* Live Character Counter */
+        .char-counter { font-size: 11px; color: var(--text-muted); font-weight: 600; transition: color 0.3s; }
+        .char-counter.warning { color: #f59e0b; }
+        .char-counter.danger { color: #ef4444; }
         
-        textarea { height: 80px; }
+        textarea, select { width: 100%; padding: 12px; border-radius: 12px; background: #0a0a0c; border: 1px solid var(--border); color: var(--text-main); font-size: 14px; outline: none; transition: all 0.3s ease; resize: none; }
+        textarea { height: 100px; } /* টেক্সট এরিয়া একটু বড় করা হয়েছে */
         textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
         
-        select { 
-            appearance: none; 
-            -webkit-appearance: none; 
-            padding-right: 30px; 
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); 
-            background-repeat: no-repeat; 
-            background-position: right 12px center; 
-            background-size: 10px auto; 
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
-            overflow: hidden; 
-        }
+        select { appearance: none; -webkit-appearance: none; padding-right: 30px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 10px auto; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         select optgroup { background: #18181b; color: var(--primary); font-weight: 600; font-style: normal; padding-top: 5px; }
         select option { background: var(--card-bg); color: var(--text-main); font-weight: 400; padding: 5px; }
         
@@ -122,23 +38,7 @@
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px var(--primary-glow); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--border); border-radius: 2px; }
         
-        button { 
-            width: 100%; 
-            height: 46px; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 15px; 
-            font-weight: 600; 
-            color: white; 
-            background: var(--primary); 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            margin-top: 5px; 
-            box-shadow: 0 4px 15px -3px var(--primary-glow); 
-        }
+        button { width: 100%; height: 46px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; color: white; background: var(--primary); cursor: pointer; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; margin-top: 5px; box-shadow: 0 4px 15px -3px var(--primary-glow); }
         button:hover { background: #4f46e5; }
         button:disabled { cursor: not-allowed; opacity: 0.8; }
         button.loading { animation: pulse 1.5s infinite; background: #4f46e5; }
@@ -172,8 +72,12 @@
         </div>
         <form id="ttsForm" style="display: flex; flex-direction: column; gap: 10px;">
             <div class="input-group">
-                <label>Text Input</label>
-                <textarea id="textInput" placeholder="Type your text here..." required></textarea>
+                <div class="label-row">
+                    <label>Text Input</label>
+                    <span class="char-counter" id="charCount">0 / 500</span>
+                </div>
+                <!-- maxlength="500" -->
+                <textarea id="textInput" placeholder="Type or paste text here (Max 500 characters)..." maxlength="500" required></textarea>
             </div>
             <div class="input-group">
                 <label>Speed Control <span id="speedValue" style="color: var(--primary);">0.9x</span></label>
@@ -225,6 +129,27 @@
     <script>
         const form = document.getElementById('ttsForm'); const submitBtn = document.getElementById('submitBtn'); const waveLoader = document.getElementById('waveLoader'); const resultSection = document.getElementById('resultSection'); const errorBox = document.getElementById('errorBox');
         const speedControl = document.getElementById('speedControl'); const speedValue = document.getElementById('speedValue'); speedControl.addEventListener('input', (e) => speedValue.innerText = e.target.value + 'x');
+        
+        // 🚀 লাইভ ক্যারেক্টার কাউন্টার লজিক (৫০০ ক্যারেক্টার)
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const maxChars = 500;
+
+        textInput.addEventListener('input', () => {
+            const currentLength = textInput.value.length;
+            charCount.innerText = `${currentLength} / ${maxChars}`;
+            
+            if (currentLength > 400) {
+                charCount.className = 'char-counter warning';
+            }
+            if (currentLength === maxChars) {
+                charCount.className = 'char-counter danger';
+            }
+            if (currentLength < 400) {
+                charCount.className = 'char-counter';
+            }
+        });
+
         const audio = document.getElementById('audioPlayer'); const playBtn = document.getElementById('playBtn'); const playIcon = document.getElementById('playIcon'); const pauseIcon = document.getElementById('pauseIcon'); const progressBar = document.getElementById('progressBar'); const progressFill = document.getElementById('progressFill'); const currentTimeEl = document.getElementById('currentTime'); const durationEl = document.getElementById('duration');
         playBtn.addEventListener('click', () => { if (audio.paused) { audio.play(); playIcon.style.display = 'none'; pauseIcon.style.display = 'block'; } else { audio.pause(); playIcon.style.display = 'block'; pauseIcon.style.display = 'none'; } });
         audio.addEventListener('timeupdate', () => { const percent = (audio.currentTime / audio.duration) * 100; progressFill.style.width = percent + '%'; currentTimeEl.innerText = formatTime(audio.currentTime); });
@@ -232,9 +157,16 @@
         audio.addEventListener('ended', () => { playIcon.style.display = 'block'; pauseIcon.style.display = 'none'; progressFill.style.width = '0%'; });
         progressBar.addEventListener('click', (e) => { const rect = progressBar.getBoundingClientRect(); const pos = (e.clientX - rect.left) / rect.width; audio.currentTime = pos * audio.duration; });
         function formatTime(seconds) { if(isNaN(seconds)) return "0:00"; const m = Math.floor(seconds / 60); const s = Math.floor(seconds % 60); return `${m}:${s < 10 ? '0' : ''}${s}`; }
+        
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const text = document.getElementById('textInput').value; const voice = document.getElementById('voiceSelect').value; const speed = speedControl.value;
+            const text = textInput.value; const voice = document.getElementById('voiceSelect').value; const speed = speedControl.value;
+            
+            if(text.length > maxChars) {
+                errorBox.style.display = 'block'; errorBox.innerText = "Text exceeds limit! Please shorten your text.";
+                return;
+            }
+
             submitBtn.disabled = true; submitBtn.innerText = "Synthesizing..."; submitBtn.classList.add('loading'); resultSection.classList.remove('active'); errorBox.style.display = 'none'; audio.pause(); waveLoader.style.display = 'flex';
             try {
                 const response = await fetch('/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text, voice: voice, speed: speed }) });
@@ -246,7 +178,7 @@
                     }, 500);
                 } else { throw new Error(data.error); }
             } catch (error) {
-                submitBtn.disabled = false; submitBtn.innerText = "Generate Voice"; submitBtn.classList.remove('loading'); waveLoader.style.display = 'none'; errorBox.style.display = 'block'; errorBox.innerText = "Error: Failed to generate.";
+                submitBtn.disabled = false; submitBtn.innerText = "Generate Voice"; submitBtn.classList.remove('loading'); waveLoader.style.display = 'none'; errorBox.style.display = 'block'; errorBox.innerText = error.message;
             }
         });
     </script>
